@@ -1,12 +1,12 @@
 ---
 galaxy_info:
-  author: Jou naam hier
+  author: Ronny Roethof
   namespace: anylinq
-  role_name: ansibletemplate
-  description: Jou omschrijving hier
+  role_name: wazuhagent
+  description: Installs and configures Wazuh Agent on Linux systems.
   company: AnyLinQ B.V.
 
-  issue_tracker_url: https://github.com/AnyLinQ-B-V/template-ansible-role/issues
+  issue_tracker_url: https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/issues
 
   license: MIT
 

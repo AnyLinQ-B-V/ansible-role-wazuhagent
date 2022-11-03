@@ -1,6 +1,6 @@
-# Ansible Role: Template
+# Ansible Role: ansible-role-wazuhagent
 
-[![CI](https://github.com/AnyLinQ-B-V/template-ansible-role/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AnyLinQ-B-V/template-ansible-role/actions/workflows/ci.yml)
+[![CI](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/actions/workflows/ci.yml)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 An template for new Ansible roles.
@@ -39,7 +39,7 @@ This example is taken from `molecule/default/converge.yml` and is tested on each
   gather_facts: yes
 
   roles:
-    - role: anylinq.ansibletemplate
+    - role: anylinq.wazuhagent
 ```
 
 ## Setup for development
