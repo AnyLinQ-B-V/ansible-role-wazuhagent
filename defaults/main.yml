@@ -1,10 +1,9 @@
 ---
 # defaults file for wazuhagent
 wazuh_version: "4.x"
-wazuh_manager_ip: ""
+wazuh_manager_ip: "127.0.0.1"
 wazuh_manager_port: "1514"
 wazuh_registration_port: "1515"
 wazuh_manager_protocol: "tcp"
 wazuh_agent_group: "default"
-wazuh_registration_password: ""
 wazuh_autoupdate: true
