@@ -46,6 +46,7 @@
     WAZUH_REGISTRATION_PORT: "{{ wazuh_registration_port }}"
     WAZUH_PROTOCOL: "{{ wazuh_manager_protocol }}"
     WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+    WAZUH_AGENT_NAME: "{{ wazuh_agent_name }}"
 
 - name: Start wazuh-agent
   ansible.builtin.service:

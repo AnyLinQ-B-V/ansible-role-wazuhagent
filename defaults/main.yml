@@ -7,3 +7,4 @@ wazuh_registration_port: "1515"
 wazuh_manager_protocol: "tcp"
 wazuh_agent_group: "default"
 wazuh_autoupdate: true
+wazuh_agent_name: "{{ ansible_fqdn }}"
