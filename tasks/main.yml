@@ -1,2 +1,64 @@
 ---
-# tasks file for ansibletemplate
+# tasks file for wazuhagent
+
+- name: Load variables based on OS type
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "vars/{{ ansible_facts.distribution | replace(' ','_') }}_{{ ansible_facts.distribution_major_version }}.yml"
+        - "vars/{{ ansible_facts.os_family }}_{{ ansible_facts.distribution_major_version }}.yml"
+        - "vars/{{ ansible_facts.distribution | replace(' ','_') }}.yml"
+        - "vars/{{ ansible_facts.os_family }}.yml"
+        - default.yml
+
+- name: Run the RedHat part
+  block:
+    - name: Import the Repo Key
+      ansible.builtin.rpm_key:
+        state: present
+        key: http://packages.wazuh.com/key/GPG-KEY-WAZUH
+    - name: Add the Wazuh Repo to the repo list
+      ansible.builtin.yum_repository:
+        name: wazuh
+        description: Wazuh Repository
+        baseurl: "https://packages.wazuh.com/{{ wazuh_version }}/yum/"
+        gpgcheck: yes
+        gpgkey: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+  when: ansible_os_family == "RedHat" or ansible_os_family == "Rocky"
+
+- name: Run the Debian part
+  block:
+    - name: "Install gnupg"
+      ansible.builtin.package:
+        name: "gnupg"
+        state: present
+    - name: "Add wazuh apt signing key"
+      ansible.builtin.apt_key:
+        url: http://packages.wazuh.com/key/GPG-KEY-WAZUH
+        state: present
+    - name: "Add wazuh repo to apt list"
+      ansible.builtin.apt_repository:
+        repo: "deb http://packages.wazuh.com/{{ wazuh_version }}/apt/ stable main"
+        state: present
+        filename: wazuh
+    - name: Updating apt cache for repo
+      ansible.builtin.apt:
+        update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install wazuh-agent package
+  ansible.builtin.package:
+    name: wazuh-agent
+    state: present
+  environment:
+    WAZUH_MANAGER: "{{ wazuh_manager_ip }}"
+    WAZUH_MANAGER_PORT: "{{ wazuh_manager_port }}"
+    WAZUH_REGISTRATION_PORT: "{{ wazuh_registration_port }}"
+    WAZUH_PROTOCOL: "{{ wazuh_manager_protocol }}"
+    WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+
+- name: Start wazuh-agent
+  ansible.builtin.service:
+    name: wazuh-agent
+    state: started
+    enabled: true
