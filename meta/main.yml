@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: Jou naam hier
+  namespace: anylinq
+  role_name: ansibletemplate
+  description: Jou omschrijving hier
+  company: AnyLinQ B.V.
+
+  issue_tracker_url: https://github.com/AnyLinQ-B-V/template-ansible-role/issues
+
+  license: MIT
+
+  min_ansible_version: 2.1
+
+  platforms:
+    - name: EL
+      versions:
+        - 8
+        - 9
+    - name: Debian
+      versions:
+        - bullseye
+
+  galaxy_tags: []
+
+dependencies: []
