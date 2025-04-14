@@ -1,0 +1,35 @@
+---
+galaxy_info:
+  author: Ronny Roethof <ronny@roethof.net>
+  namespace: anylinq
+  role_name: ansibletemplate
+  description: A template for creating new Ansible roles
+  company: AnyLinQ B.V.
+
+  issue_tracker_url: https://github.com/AnyLinQ-B-V/template-ansible-role/issues
+
+  license: MIT
+
+  min_ansible_version: "2.10"
+
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm    # Debian 12
+        - trixie      # Debian 13
+    - name: Ubuntu
+      versions:
+        - jammy       # 22.04 LTS
+        - noble       # 24.04 LTS
+    - name: EL
+      versions:
+        - "9"         # RHEL/Rocky 9
+
+  galaxy_tags:
+    - template
+    - ansible
+    - role
+    - example
+    - linux
+
+dependencies: []
