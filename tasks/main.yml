@@ -125,14 +125,6 @@
         ENROLLMENT_DELAY: "{{ wazuh_enrollment_delay }}"
       when: not wazuh_agent_dl_only | bool
 
-    # Some task that changes wazuh-agent config
-    - name: Some task that changes wazuh-agent config
-      ansible.builtin.template:
-        src: wazuh.conf.j2
-        dest: /var/ossec/etc/ossec.conf
-        mode: '0600'
-      notify: Restart wazuh-agent
-
 # Tasks for RedHat-based systems
 - name: Perform tasks for RedHat-based systems
   when: ansible_os_family == "RedHat"
@@ -194,11 +186,3 @@
         WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
         ENROLLMENT_DELAY: "{{ wazuh_enrollment_delay }}"
       when: not wazuh_agent_dl_only | bool
-
-    # Some task that changes wazuh-agent config
-    - name: Some task that changes wazuh-agent config
-      ansible.builtin.template:
-        src: wazuh.conf.j2
-        dest: /var/ossec/etc/ossec.conf
-        mode: '0600'
-      notify: Restart wazuh-agent
