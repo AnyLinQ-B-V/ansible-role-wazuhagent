@@ -3,7 +3,7 @@
 
 # Wazuh Manager Configuration
 wazuh_version: "4.x"                                 # Wazuh agent version
-wazuh_manager_ip: "127.0.0.1"                        # IP address of the Wazuh manager
+wazuh_manager_ip: ""                                 # IP address of the Wazuh manager
 wazuh_manager_port: 1514                             # Port for Wazuh manager communication
 wazuh_manager_protocol: tcp                          # Protocol for communication (tcp/udp)
 
@@ -16,7 +16,7 @@ wazuh_registration_certificate_path: ""              # Path to client certificat
 wazuh_registration_key_path: ""                      # Path to client key (optional)
 
 # Agent Configuration
-wazuh_agent_name: "{{ ansible_hostname }}"           # Name of the agent (defaults to hostname)
+wazuh_agent_name: "{{ inventory_hostname }}"         # Name of the agent (defaults to inventory_hostname)
 wazuh_agent_group: "default"                         # Agent group
 wazuh_keep_alive_interval: 10                        # Keep-alive interval in seconds
 wazuh_time_reconnect: 60                             # Time to wait before reconnecting in seconds
