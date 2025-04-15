@@ -59,7 +59,6 @@
         url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
         keyring: /etc/apt/trusted.gpg
         state: absent
-      when: wazuh_repository is not defined
 
     # Add the new Wazuh apt signing key
     - name: "Debian | Add Wazuh apt signing key"
@@ -67,8 +66,6 @@
         url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
         dest: /etc/apt/trusted.gpg.d/wazuh.asc
         mode: '0644'
-        force: true
-      when: wazuh_repository is not defined
 
     # Add the default Wazuh repository to the apt sources list
     - name: "Debian | Add Wazuh repository to apt list (default)"
@@ -76,15 +73,6 @@
         repo: "deb https://packages.wazuh.com/{{ wazuh_version }}/apt/ stable main"
         state: present
         filename: wazuh
-      when: wazuh_repository is not defined
-
-    # Add a custom Wazuh repository if defined
-    - name: "Debian | Add Wazuh repository to apt list (custom)"
-      ansible.builtin.apt_repository:
-        repo: "{{ wazuh_repository }}"
-        state: present
-        filename: wazuh
-      when: wazuh_repository is defined and wazuh_repository | length > 0
 
     ### Handle Wazuh Agent package
     # Uninstall the Wazuh Agent package if reinstall is required
