@@ -2,27 +2,18 @@
 # Tasks file for Wazuh Agent role
 
 ### Pre-check: Verify supported distribution
-- name: Verify if the distribution is supported
+- name: Verify if the OS family is supported
   block:
-    # Assert that the current distribution is supported by the role
-    - name: Assert if the distribution is supported
+    # Assert that the current OS family is supported by the role
+    - name: Assert if the OS family is supported (RedHat or Debian)
       ansible.builtin.assert:
         that:
-          - ansible_distribution in galaxy_info.platforms | json_query('[].name')
-          - (
-              ansible_distribution_release in (
-                galaxy_info.platforms | selectattr('name', 'match', ansible_distribution) | list | first
-              ).versions
-            ) or (
-              ansible_distribution_major_version in (
-                galaxy_info.platforms | selectattr('name', 'match', ansible_distribution) | list | first
-              ).versions
-            )
-        fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
-        success_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is supported. Continuing play."
+          - ansible_os_family == "RedHat" or ansible_os_family == "Debian"
+        fail_msg: "OS family {{ ansible_os_family }} is not supported by this role (requires RedHat or Debian)."
+        success_msg: "OS family {{ ansible_os_family }} is supported. Continuing play."
   rescue:
-    # End the play if the distribution is unsupported
-    - name: End play for unsupported distribution
+    # End the play if the OS family is unsupported
+    - name: End play for unsupported OS family
       ansible.builtin.meta: end_host
 
 ### Load OS-specific variables
