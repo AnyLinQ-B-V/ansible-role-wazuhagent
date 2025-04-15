@@ -1,0 +1,3 @@
+---
+# Wazuh Agent profile for Debian 12 (Bookworm)
+wazuh_agent_profile: "Linux, Debian 12 (Bookworm)"

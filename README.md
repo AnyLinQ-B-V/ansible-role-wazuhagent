@@ -1,32 +1,64 @@
-# Ansible Role: Template
+# Ansible Role: Wazuh Agent
 
-[![CI](https://github.com/AnyLinQ-B-V/template-ansible-role/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AnyLinQ-B-V/template-ansible-role/actions/workflows/ci.yml)
+[![CI](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/actions/workflows/ci.yml)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-A template for creating new Ansible roles.
+A role for installing and configuring the Wazuh Agent.
 
 ## Supported Platforms
 
-  - Debian
-    - Debian 12 (Bookworm)
-    - Debian 13 (Trixie)
-  - Ubuntu
-    - Ubuntu 22.04 LTS (Jammy)
-    - Ubuntu 24.04 LTS (Noble)
-  - Enterprise Linux
-    - EL 9
+- **Red Hat Enterprise Linux**
+  - 8
+  - 9
+- **Debian**
+  - 11 (Bullseye)
+  - 12 (Bookworm)
 
 ## Requirements
 
   - Ansible >= 2.10
   - Python 3.x
 
+### Important Configuration Requirement
+
+The `wazuh_manager_ip` variable **must** be set to the IP address of your Wazuh Manager. By default, it is set to `127.0.0.1`. This is an intentional safeguard to prevent accidental misconfiguration that could disrupt your existing setup. By requiring you to explicitly configure this variable, we ensure that you are fully aware of the changes being made to your environment.
+
+Example:
+```yaml
+wazuh_manager_ip: "192.168.1.100"  # Replace with the actual IP of your Wazuh Manager
+```
+
 ## Role Variables
 
-The default values for the variables are set in `defaults/main.yml`:
+### Defaults
+
+The following variables are defined in `defaults/main.yml` and can be overridden as needed:
+
 ```yaml
-# Example variable
-template_example_variable: "default_value"
+# Wazuh Manager Configuration
+wazuh_version: "4.x"                                 # Wazuh agent version
+wazuh_manager_ip: "1.2.3.4"                          # IP address of the Wazuh manager
+wazuh_manager_port: 1514                             # Port for Wazuh manager communication
+wazuh_manager_protocol: tcp                          # Protocol for communication (tcp/udp)
+
+# Wazuh Registration Configuration
+wazuh_registration_server: "{{ wazuh_manager_ip }}"  # Registration server (defaults to manager IP)
+wazuh_registration_port: 1515                        # Registration server port
+wazuh_registration_password: ""                      # Registration password (leave empty if not required)
+wazuh_registration_ca_path: ""                       # Path to CA certificate for registration (optional)
+wazuh_registration_certificate_path: ""              # Path to client certificate (optional)
+wazuh_registration_key_path: ""                      # Path to client key (optional)
+
+# Agent Configuration
+wazuh_agent_name: "{{ ansible_hostname }}"           # Name of the agent (defaults to hostname)
+wazuh_agent_group: "default"                         # Agent group
+wazuh_keep_alive_interval: 10                        # Keep-alive interval in seconds
+wazuh_time_reconnect: 60                             # Time to wait before reconnecting in seconds
+wazuh_enrollment_delay: 20                           # Delay before enrollment in seconds
+
+# Installation Options
+wazuh_agent_reinstall: false                         # Force reinstall of the agent
+wazuh_agent_dl_only: false                           # Download only, do not install
 ```
 
 ## Dependencies
@@ -43,7 +75,7 @@ This example is taken from `molecule/default/converge.yml` and is tested on each
   gather_facts: yes
 
   roles:
-    - role: anylinq.ansibletemplate
+    - role: anylinq.ansible-role-wazuhagent
 ```
 
 ## Testing
@@ -77,15 +109,15 @@ MIT
 
 ## Changelog
 
-See [CHANGELOG.md](https://github.com/AnyLinQ-B-V/template-ansible-role/blob/main/CHANGELOG.md) for a list of all notable changes to this project.
+See [CHANGELOG.md](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/blob/main/CHANGELOG.md) for a list of all notable changes to this project.
 
 ## Security
 
-Please see our [Security Policy](https://github.com/AnyLinQ-B-V/template-ansible-role/blob/main/SECURITY.md) for reporting vulnerabilities.
+Please see our [Security Policy](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/blob/main/SECURITY.md) for reporting vulnerabilities.
 
 ## Contributing
 
-Please read our [Contributing Guide](https://github.com/AnyLinQ-B-V/template-ansible-role/blob/main/CONTRIBUTING.md) and our [Code of Conduct](https://github.com/AnyLinQ-B-V/template-ansible-role/blob/main/CODE_OF_CONDUCT.md) before submitting a Pull Request.
+Please read our [Contributing Guide](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/blob/main/CONTRIBUTING.md) and our [Code of Conduct](https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/blob/main/CODE_OF_CONDUCT.md) before submitting a Pull Request.
 
 ---
 

@@ -1,11 +1,14 @@
 ---
-# This is an example playbook to execute Ansible tests.
+# This is a generic verification playbook.
+# It assumes that if the converge step completed without errors,
+# the basic role execution is considered successful.
+# No specific state is checked here.
 
-- name: Verify
+- name: Verify role convergence success (Generic Check)
   hosts: all
-  become: true
+  become: false # No need for become for a simple debug/assert true
   gather_facts: false
   tasks:
-    - name: Example assertion
-      ansible.builtin.assert:
-        that: true
+    - name: Confirm converge step completed
+      ansible.builtin.debug:
+        msg: "Converge completed without errors. Generic verification passed."

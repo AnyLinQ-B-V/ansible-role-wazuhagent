@@ -1,2 +1,213 @@
 ---
-# tasks file for ansibletemplate
+# Tasks file for Wazuh Agent role
+
+### Pre-check: Verify supported distribution
+- name: Verify if the distribution is supported
+  block:
+    # Assert that the current distribution is supported by the role
+    - name: Assert if the distribution is supported
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution in galaxy_info.platforms | json_query('[].name')
+          - (
+              ansible_distribution_release in (
+                galaxy_info.platforms | selectattr('name', 'match', ansible_distribution) | list | first
+              ).versions
+            ) or (
+              ansible_distribution_major_version in (
+                galaxy_info.platforms | selectattr('name', 'match', ansible_distribution) | list | first
+              ).versions
+            )
+        fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+        success_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is supported. Continuing play."
+  rescue:
+    # End the play if the distribution is unsupported
+    - name: End play for unsupported distribution
+      ansible.builtin.meta: end_host
+
+### Load OS-specific variables
+- name: Load OS-specific variables
+  when: params | length > 0
+  ansible.builtin.include_vars: "{{ params }}"
+  vars:
+    # Define the list of variable files to search for based on the OS and version
+    params_:
+      files:
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      paths:
+        - vars
+    # Use the first found variable file
+    params: "{{ lookup('first_found', params_, errors='ignore') }}"
+  tags:
+    - vars
+
+### Distro-Specific Tasks
+# Tasks for Debian-based systems
+- name: Perform tasks for Debian-based systems
+  when: ansible_os_family == "Debian"
+  block:
+    ### Install prerequisites
+    # Install the gnupg package required for managing keys
+    - name: "Debian | Install gnupg"
+      ansible.builtin.package:
+        name: "gnupg"
+        state: present
+      register: pkg_result
+      retries: 12
+      delay: 10
+      until: pkg_result is success
+
+    ### Manage Wazuh repository and signing key
+    # Remove the old Wazuh apt signing key if it exists
+    - name: "Debian | Remove old Wazuh apt signing key"
+      ansible.builtin.apt_key:
+        url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+        keyring: /etc/apt/trusted.gpg
+        state: absent
+      when: wazuh_repository is not defined
+
+    # Add the new Wazuh apt signing key
+    - name: "Debian | Add Wazuh apt signing key"
+      ansible.builtin.get_url:
+        url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+        dest: /etc/apt/trusted.gpg.d/wazuh.asc
+        mode: '0644'
+        force: true
+      when: wazuh_repository is not defined
+
+    # Add the default Wazuh repository to the apt sources list
+    - name: "Debian | Add Wazuh repository to apt list (default)"
+      ansible.builtin.apt_repository:
+        repo: "deb https://packages.wazuh.com/{{ wazuh_version }}/apt/ stable main"
+        state: present
+        filename: wazuh
+      when: wazuh_repository is not defined
+
+    # Add a custom Wazuh repository if defined
+    - name: "Debian | Add Wazuh repository to apt list (custom)"
+      ansible.builtin.apt_repository:
+        repo: "{{ wazuh_repository }}"
+        state: present
+        filename: wazuh
+      when: wazuh_repository is defined and wazuh_repository | length > 0
+
+    ### Handle Wazuh Agent package
+    # Uninstall the Wazuh Agent package if reinstall is required
+    - name: "Debian | Uninstall Wazuh Agent package"
+      ansible.builtin.apt:
+        name: "wazuh-agent"
+        state: absent
+        purge: true
+      when: wazuh_agent_reinstall | bool
+
+    # Delete the Wazuh configuration folder if reinstall is required
+    - name: "Debian | Delete Wazuh configuration folder"
+      ansible.builtin.file:
+        path: "/var/ossec"
+        state: absent
+      when: wazuh_agent_reinstall | bool
+
+    # Install the Wazuh Agent package
+    - name: "Debian | Install Wazuh Agent package"
+      ansible.builtin.package:
+        name: "wazuh-agent"
+        state: present
+        update_cache: true
+      environment:
+        WAZUH_MANAGER: "{{ wazuh_manager_ip }}"
+        WAZUH_MANAGER_PORT: "{{ wazuh_manager_port }}"
+        WAZUH_PROTOCOL: "{{ wazuh_manager_protocol }}"
+        WAZUH_REGISTRATION_SERVER: "{{ wazuh_registration_server }}"
+        WAZUH_REGISTRATION_PORT: "{{ wazuh_registration_port }}"
+        WAZUH_REGISTRATION_PASSWORD: "{{ wazuh_registration_password }}"
+        WAZUH_KEEP_ALIVE_INTERVAL: "{{ wazuh_keep_alive_interval }}"
+        WAZUH_TIME_RECONNECT: "{{ wazuh_time_reconnect }}"
+        WAZUH_REGISTRATION_CA: "{{ wazuh_registration_ca_path }}"
+        WAZUH_REGISTRATION_CERTIFICATE: "{{ wazuh_registration_certificate_path }}"
+        WAZUH_REGISTRATION_KEY: "{{ wazuh_registration_key_path }}"
+        WAZUH_AGENT_NAME: "{{ wazuh_agent_name }}"
+        WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+        ENROLLMENT_DELAY: "{{ wazuh_enrollment_delay }}"
+      when: not wazuh_agent_dl_only | bool
+
+    # Some task that changes wazuh-agent config
+    - name: Some task that changes wazuh-agent config
+      ansible.builtin.template:
+        src: wazuh.conf.j2
+        dest: /var/ossec/etc/ossec.conf
+        mode: '0600'
+      notify: Restart wazuh-agent
+
+# Tasks for RedHat-based systems
+- name: Perform tasks for RedHat-based systems
+  when: ansible_os_family == "RedHat"
+  block:
+    ### Add Wazuh GPG Key and Repository
+    # Import the Wazuh GPG key
+    - name: "RedHat | Import Wazuh GPG key"
+      ansible.builtin.rpm_key:
+        state: present
+        key: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+
+    # Configure the Wazuh repository
+    - name: "RedHat | Configure Wazuh repository"
+      ansible.builtin.copy:
+        dest: /etc/yum.repos.d/wazuh.repo
+        content: |
+          [wazuh_repo]
+          gpgcheck=1
+          gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+          enabled=1
+          name=Wazuh repository
+          baseurl=https://packages.wazuh.com/{{ wazuh_version }}/yum/
+          protect=1
+        mode: "0644"
+
+    ### Handle Wazuh Agent package
+    # Uninstall the Wazuh Agent package if reinstall is required
+    - name: "RedHat | Uninstall Wazuh Agent package"
+      ansible.builtin.dnf:
+        name: "wazuh-agent"
+        state: absent
+      when: wazuh_agent_reinstall | bool
+
+    # Delete the Wazuh configuration folder if reinstall is required
+    - name: "RedHat | Delete Wazuh configuration folder"
+      ansible.builtin.file:
+        path: "/var/ossec"
+        state: absent
+      when: wazuh_agent_reinstall | bool
+
+    # Install the Wazuh Agent package
+    - name: "RedHat | Install Wazuh Agent package"
+      ansible.builtin.dnf:
+        name: wazuh-agent
+        state: present
+      environment:
+        WAZUH_MANAGER: "{{ wazuh_manager_ip }}"
+        WAZUH_MANAGER_PORT: "{{ wazuh_manager_port }}"
+        WAZUH_PROTOCOL: "{{ wazuh_manager_protocol }}"
+        WAZUH_REGISTRATION_SERVER: "{{ wazuh_registration_server }}"
+        WAZUH_REGISTRATION_PORT: "{{ wazuh_registration_port }}"
+        WAZUH_REGISTRATION_PASSWORD: "{{ wazuh_registration_password }}"
+        WAZUH_KEEP_ALIVE_INTERVAL: "{{ wazuh_keep_alive_interval }}"
+        WAZUH_TIME_RECONNECT: "{{ wazuh_time_reconnect }}"
+        WAZUH_REGISTRATION_CA: "{{ wazuh_registration_ca_path }}"
+        WAZUH_REGISTRATION_CERTIFICATE: "{{ wazuh_registration_certificate_path }}"
+        WAZUH_REGISTRATION_KEY: "{{ wazuh_registration_key_path }}"
+        WAZUH_AGENT_NAME: "{{ wazuh_agent_name }}"
+        WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+        ENROLLMENT_DELAY: "{{ wazuh_enrollment_delay }}"
+      when: not wazuh_agent_dl_only | bool
+
+    # Some task that changes wazuh-agent config
+    - name: Some task that changes wazuh-agent config
+      ansible.builtin.template:
+        src: wazuh.conf.j2
+        dest: /var/ossec/etc/ossec.conf
+        mode: '0600'
+      notify: Restart wazuh-agent

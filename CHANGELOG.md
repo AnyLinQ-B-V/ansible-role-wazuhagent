@@ -5,22 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.3] - 2025-04-12
+## [0.1.0] - 2025-04-15
+
+### Added
+- Support for Red Hat Enterprise Linux 9 and Debian 12 (Bookworm).
+- OS-specific variable files in the `vars` directory (`redhat-8.yml`, `redhat-9.yml`, `debian-11.yml`, `debian-12.yml`).
+- Detailed comments in `tasks/main.yml` and `handlers/main.yml` for better readability.
+- Example playbook in the `README.md` file.
+- Molecule test matrix for Debian 12 and Ubuntu 22.04.
 
 ### Changed
+- Replaced all instances of `template-ansible-role` with `ansible-role-wazuhagent` in the `README.md` and other files.
+- Updated `README.md` to reflect the correct repository path and supported platforms.
+- Improved task structure in `tasks/main.yml` by grouping distro-specific tasks into blocks.
 
-- Updated `README.md` to align with the latest role structure and documentation standards.
-- Updated `ci.yml` to use the latest GitHub Actions workflows and Molecule testing matrix.
-- Updated `stale.yml` to improve issue and pull request management.
-- Updated `meta/main.yml` to reflect the latest supported platforms and tags.
-- Updated `rename.sh` script for better usability and clarity.
-- Updated `molecule.yml` to align with the latest Molecule and Docker configurations.
-
-## [0.0.2] - 2022-10-31
-
-### Changed
-
-- All references to the `anysure` namespace have been replaced by the `anylinq` namespace.
+### Fixed
+- Ensured all variables in `defaults/main.yml` are correctly used in tasks and handlers.
+- Corrected links in the `README.md` to point to the correct GitHub repository.
 
 ## [0.0.1] - 2022-10-11
 

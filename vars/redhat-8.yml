@@ -1,0 +1,3 @@
+---
+# Wazuh Agent profile for Red Hat Enterprise Linux 8
+wazuh_agent_profile: "Linux, Red Hat Enterprise Linux 8"

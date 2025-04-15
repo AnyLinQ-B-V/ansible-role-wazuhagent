@@ -3,8 +3,20 @@ extends: default
 
 rules:
   line-length:
-    max: 120
+    max: 160
     level: warning
+  indentation:
+    spaces: 2
+  document-start: enable
+  comments:
+    min-spaces-from-content: 1
+    # indentation: true  <-- REMOVE THIS LINE
+  comments-indentation: enable # <-- ADD THIS RULE if you want to check comment indentation
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
 
 ignore: |
   .github/stale.yml

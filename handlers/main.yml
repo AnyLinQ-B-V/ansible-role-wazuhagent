@@ -1,2 +1,10 @@
 ---
-# handlers file for ansibletemplate
+# Handlers file for Wazuh Agent
+# This file contains handlers that are triggered by notifications from other tasks.
+
+- name: Restart wazuh-agent
+  # Restart and enable the wazuh-agent service if notified by a task
+  ansible.builtin.service:
+    name: wazuh-agent
+    state: restarted
+    enabled: true

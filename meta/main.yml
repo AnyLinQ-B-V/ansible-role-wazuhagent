@@ -1,35 +1,41 @@
 ---
 galaxy_info:
+  # The author of the role
   author: Ronny Roethof <ronny@roethof.net>
+  # The Ansible Galaxy namespace for the role
   namespace: anylinq
-  role_name: ansibletemplate
-  description: A template for creating new Ansible roles
+  # The name of the role as it appears on Ansible Galaxy
+  role_name: wazuhagent
+  # A short description of the role
+  description: An Ansible role for installing and configuring the Wazuh Agent
+  # The company or organization maintaining the role
   company: AnyLinQ B.V.
-
-  issue_tracker_url: https://github.com/AnyLinQ-B-V/template-ansible-role/issues
-
+  # URL to the issue tracker for this role
+  issue_tracker_url: https://github.com/AnyLinQ-B-V/ansible-role-wazuhagent/issues
+  # The license under which the role is distributed
   license: MIT
-
+  # The minimum required Ansible version
   min_ansible_version: "2.10"
-
+  # Supported platforms and versions
   platforms:
     - name: Debian
       versions:
+        - bullseye    # Debian 11
         - bookworm    # Debian 12
-        - trixie      # Debian 13
-    - name: Ubuntu
-      versions:
-        - jammy       # 22.04 LTS
-        - noble       # 24.04 LTS
     - name: EL
       versions:
-        - "9"         # RHEL/Rocky 9
-
+        - all
+  # Tags for Ansible Galaxy search and categorization
   galaxy_tags:
-    - template
-    - ansible
-    - role
-    - example
+    - wazuh
+    - agent
+    - security
+    - monitoring
     - linux
+    - rhel
+    - debian
+    - compliance
+    - intrusiondetection
 
+# List of role dependencies (empty if none)
 dependencies: []

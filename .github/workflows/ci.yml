@@ -8,7 +8,7 @@ name: CI
 
 defaults:
   run:
-    working-directory: 'anylinq.ansibletemplate'
+    working-directory: 'ansible-role-wazuhagent'
 
 jobs:
   lint:
@@ -18,7 +18,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          path: 'anylinq.ansibletemplate'
+          path: 'ansible-role-wazuhagent'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -51,7 +51,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          path: 'anylinq.ansibletemplate'
+          path: 'ansible-role-wazuhagent'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run molecule test
         run: molecule test
-        working-directory: anylinq.ansibletemplate
+        working-directory: ansible-role-wazuhagent
         env:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
@@ -89,7 +89,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          path: 'anylinq.ansibletemplate'
+          path: 'ansible-role-wazuhagent'
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -109,4 +109,4 @@ jobs:
           ansible-galaxy role import \
             --api-key ${{ secrets.GALAXY_API_KEY }} \
             ${REPO_OWNER} ${REPO_NAME}
-        working-directory: anylinq.ansibletemplate
+        working-directory: ansible-role-wazuhagent

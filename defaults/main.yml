@@ -1,2 +1,27 @@
 ---
-# defaults file for ansibletemplate
+# Defaults file for Wazuh Agent configuration
+
+# Wazuh Manager Configuration
+wazuh_version: "4.x"                                 # Wazuh agent version
+wazuh_manager_ip: "127.0.0.1"                        # IP address of the Wazuh manager
+wazuh_manager_port: 1514                             # Port for Wazuh manager communication
+wazuh_manager_protocol: tcp                          # Protocol for communication (tcp/udp)
+
+# Wazuh Registration Configuration
+wazuh_registration_server: "{{ wazuh_manager_ip }}"  # Registration server (defaults to manager IP)
+wazuh_registration_port: 1515                        # Registration server port
+wazuh_registration_password: ""                      # Registration password (leave empty if not required)
+wazuh_registration_ca_path: ""                       # Path to CA certificate for registration (optional)
+wazuh_registration_certificate_path: ""              # Path to client certificate (optional)
+wazuh_registration_key_path: ""                      # Path to client key (optional)
+
+# Agent Configuration
+wazuh_agent_name: "{{ ansible_hostname }}"           # Name of the agent (defaults to hostname)
+wazuh_agent_group: "default"                         # Agent group
+wazuh_keep_alive_interval: 10                        # Keep-alive interval in seconds
+wazuh_time_reconnect: 60                             # Time to wait before reconnecting in seconds
+wazuh_enrollment_delay: 20                           # Delay before enrollment in seconds
+
+# Installation Options
+wazuh_agent_reinstall: false                         # Force reinstall of the agent
+wazuh_agent_dl_only: false                           # Download only, do not install
