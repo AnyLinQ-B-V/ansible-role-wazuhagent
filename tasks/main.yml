@@ -51,7 +51,7 @@
       retries: 12
       delay: 10
       until: pkg_result is success
-    notify: Restart wazuh-agent
+      notify: Restart wazuh-agent
 
     ### Manage Wazuh repository and signing key
     # Remove the old Wazuh apt signing key if it exists
@@ -113,7 +113,7 @@
         WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
         ENROLLMENT_DELAY: "{{ wazuh_enrollment_delay }}"
       when: not wazuh_agent_dl_only | bool
-    notify: Restart wazuh-agent
+      notify: Restart wazuh-agent
 
 # Tasks for RedHat-based systems
 - name: Perform tasks for RedHat-based systems
